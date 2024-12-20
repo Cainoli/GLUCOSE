@@ -29,6 +29,10 @@ public:
 	//Visual representation of the pickup
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Lyra|Pickup|Mesh")
 	TObjectPtr<UStaticMesh> DisplayMesh;
+	
+	//Sets the height of the display mesh above the Weapon spawner
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pickup|Mesh")
+	FTransform ItemMeshTransform;
 
 	//Cool down time between pickups in seconds
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Lyra|Pickup")

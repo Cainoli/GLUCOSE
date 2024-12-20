@@ -12,11 +12,6 @@ ALyraWorldCollectable::ALyraWorldCollectable()
 {
 }
 
-void ALyraWorldCollectable::GatherInteractionOptions(const FInteractionQuery& InteractQuery, FInteractionOptionBuilder& InteractionBuilder)
-{
-	InteractionBuilder.AddInteractionOption(Option);
-}
-
 FInventoryPickup ALyraWorldCollectable::GetPickupInventory() const
 {
 	return StaticInventory;

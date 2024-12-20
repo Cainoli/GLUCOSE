@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "Interaction/Actors/LyraWorldInteractable.h"
 #include "Interaction/IInteractableTarget.h"
 #include "Interaction/InteractionOption.h"
 #include "Inventory/IPickupable.h"
@@ -16,7 +16,7 @@ struct FInteractionQuery;
  * 
  */
 UCLASS(Abstract, Blueprintable)
-class ALyraWorldCollectable : public AActor, public IInteractableTarget, public IPickupable
+class ALyraWorldCollectable : public ALyraWorldInteractable, public IPickupable
 {
 	GENERATED_BODY()
 
@@ -24,12 +24,9 @@ public:
 
 	ALyraWorldCollectable();
 
-	virtual void GatherInteractionOptions(const FInteractionQuery& InteractQuery, FInteractionOptionBuilder& InteractionBuilder) override;
 	virtual FInventoryPickup GetPickupInventory() const override;
 
 protected:
-	UPROPERTY(EditAnywhere)
-	FInteractionOption Option;
 
 	UPROPERTY(EditAnywhere)
 	FInventoryPickup StaticInventory;

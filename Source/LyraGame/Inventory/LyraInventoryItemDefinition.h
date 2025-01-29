@@ -46,12 +46,13 @@ public:
 	const ULyraInventoryItemFragment* FindFragmentByClass(TSubclassOf<ULyraInventoryItemFragment> FragmentClass) const;
 };
 
-//@TODO: Make into a subsystem instead?
-UCLASS()
+/** @deprecated Use ULyraInventorySubsystem instead */
+UCLASS(meta=(DeprecatedNode, DeprecationMessage="Use ULyraInventorySubsystem instead"))
 class ULyraInventoryFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-	UFUNCTION(BlueprintCallable, meta=(DeterminesOutputType=FragmentClass))
-	static const ULyraInventoryItemFragment* FindItemDefinitionFragment(TSubclassOf<ULyraInventoryItemDefinition> ItemDef, TSubclassOf<ULyraInventoryItemFragment> FragmentClass);
+    /** @deprecated Use ULyraInventorySubsystem::FindItemDefinitionFragment instead */
+    UFUNCTION(BlueprintCallable, meta=(DeprecatedFunction, DeprecationMessage="Use ULyraInventorySubsystem::FindItemDefinitionFragment instead", DeterminesOutputType=FragmentClass))
+    static const ULyraInventoryItemFragment* FindItemDefinitionFragment(TSubclassOf<ULyraInventoryItemDefinition> ItemDef, TSubclassOf<ULyraInventoryItemFragment> FragmentClass);
 };

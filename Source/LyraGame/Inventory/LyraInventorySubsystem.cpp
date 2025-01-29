@@ -82,3 +82,29 @@ void ULyraInventorySubsystem::InitializeItemInstance(ULyraInventoryItemInstance*
         }
     }
 }
+
+bool ULyraInventorySubsystem::IsValidItemInstance(const ULyraInventoryItemInstance* Instance) const
+{
+    return IsValid(Instance) && Instance->GetItemDef() != nullptr && ManagedItems.Contains(Instance);
+}
+
+TArray<ULyraInventoryItemInstance*> ULyraInventorySubsystem::GetValidItemsFromList(const TArray<FLyraInventoryEntry>& Entries) const
+{
+    TArray<TObjectPtr<ULyraInventoryItemInstance>> Results;
+    Results.Reserve(Entries.Num());
+    for (const FLyraInventoryEntry& Entry : Entries)
+    {
+        if (IsValidItemInstance(Entry.Instance))
+        {
+            Results.Add(Entry.Instance);
+        }
+    }
+    return Results;
+}
+
+void ULyraInventorySubsystem::CleanupInvalidItems()
+{
+    ManagedItems.RemoveAll([](const ULyraInventoryItemInstance* Item) {
+        return !IsValid(Item);
+    });
+}

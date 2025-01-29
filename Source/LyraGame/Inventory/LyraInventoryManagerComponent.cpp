@@ -89,7 +89,6 @@ ULyraInventoryItemInstance* FLyraInventoryList::AddEntry(TSubclassOf<ULyraInvent
 	AActor* OwningActor = OwnerComponent->GetOwner();
 	check(OwningActor->HasAuthority());
 
-
 	// Create the item instance through the subsystem
     if (UGameInstance* GameInstance = OwnerComponent->GetWorld()->GetGameInstance())
     {
@@ -114,7 +113,30 @@ ULyraInventoryItemInstance* FLyraInventoryList::AddEntry(TSubclassOf<ULyraInvent
 
 void FLyraInventoryList::AddEntry(ULyraInventoryItemInstance* Instance)
 {
-	unimplemented();
+	check(Instance);
+ 	check(OwnerComponent);
+	
+    AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+	
+    // Check if the instance is already managed by the inventory subsystem
+    if (UGameInstance* GameInstance = OwnerComponent->GetWorld()->GetGameInstance())
+    {
+        if (ULyraInventorySubsystem* InventorySubsystem = GameInstance->GetSubsystem<ULyraInventorySubsystem>())
+        {
+            if (!InventorySubsystem->IsValidItemInstance(Instance))
+            {
+                // If not managed, initialize it through the subsystem
+                InventorySubsystem->InitializeItemInstance(Instance, Instance->GetItemDef());
+            }
+        }
+    }
+    // Add to inventory
+    FLyraInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+    NewEntry.Instance = Instance;
+    NewEntry.StackCount = 1;
+    NewEntry.LastObservedCount = 1;
+    BroadcastChangeMessage(NewEntry, /*OldCount=*/ 0, /*NewCount=*/ 1);
 }
 
 void FLyraInventoryList::RemoveEntry(ULyraInventoryItemInstance* Instance)
@@ -132,16 +154,14 @@ void FLyraInventoryList::RemoveEntry(ULyraInventoryItemInstance* Instance)
 
 TArray<ULyraInventoryItemInstance*> FLyraInventoryList::GetAllItems() const
 {
-	TArray<ULyraInventoryItemInstance*> Results;
-	Results.Reserve(Entries.Num());
-	for (const FLyraInventoryEntry& Entry : Entries)
-	{
-		if (Entry.Instance != nullptr) //@TODO: Would prefer to not deal with this here and hide it further?
-		{
-			Results.Add(Entry.Instance);
-		}
-	}
-	return Results;
+	if (UGameInstance* GameInstance = OwnerComponent->GetWorld()->GetGameInstance())
+    {
+        if (ULyraInventorySubsystem* InventorySubsystem = GameInstance->GetSubsystem<ULyraInventorySubsystem>())
+        {
+            return InventorySubsystem->GetValidItemsFromList(Entries);
+        }
+    }
+    return TArray<ULyraInventoryItemInstance*>();
 }
 
 //////////////////////////////////////////////////////////////////////

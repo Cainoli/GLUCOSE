@@ -10,6 +10,7 @@
 class ULyraInventoryItemDefinition;
 class ULyraInventoryItemInstance;
 class ULyraInventoryManagerComponent;
+class ULyraInventorySubsystem;
 class UObject;
 struct FFrame;
 struct FLyraInventoryList;
@@ -50,6 +51,7 @@ struct FLyraInventoryEntry : public FFastArraySerializerItem
 private:
 	friend FLyraInventoryList;
 	friend ULyraInventoryManagerComponent;
+	friend ULyraInventorySubsystem;
 
 	UPROPERTY()
 	TObjectPtr<ULyraInventoryItemInstance> Instance = nullptr;

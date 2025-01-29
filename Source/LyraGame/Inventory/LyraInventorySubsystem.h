@@ -42,6 +42,14 @@ public:
 
     /** Initialize a newly created inventory item instance */
     void InitializeItemInstance(ULyraInventoryItemInstance* Instance, TSubclassOf<ULyraInventoryItemDefinition> ItemDef);
+	
+	/** Validate if an inventory item instance is still valid */
+    UFUNCTION(BlueprintCallable, Category="Lyra|Inventory")
+    bool IsValidItemInstance(const ULyraInventoryItemInstance* Instance) const;
+	
+    /** Get all valid items from an inventory entry array */
+    UFUNCTION(BlueprintCallable, Category="Lyra|Inventory")
+    TArray<ULyraInventoryItemInstance*> GetValidItemsFromList(const TArray<struct FLyraInventoryEntry>& Entries) const;
 
 private:
     /** List of all active inventory components */
@@ -51,4 +59,7 @@ private:
     /** Cache of created inventory items for proper lifecycle management */
     UPROPERTY()
     TArray<TObjectPtr<ULyraInventoryItemInstance>> ManagedItems;
+	
+	/** Remove invalid items from management */
+    void CleanupInvalidItems();
 };

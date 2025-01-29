@@ -8,6 +8,7 @@
 #include "LyraInventoryFilter.h"
 #include "LyraInventoryItemDefinition.h"
 #include "LyraInventoryItemInstance.h"
+#include "LyraInventorySubsystem.h"
 #include "NativeGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
@@ -89,21 +90,24 @@ ULyraInventoryItemInstance* FLyraInventoryList::AddEntry(TSubclassOf<ULyraInvent
 	check(OwningActor->HasAuthority());
 
 
-	FLyraInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
-	NewEntry.Instance = NewObject<ULyraInventoryItemInstance>(OwnerComponent->GetOwner());  //@TODO: Using the actor instead of component as the outer due to UE-127172
-	NewEntry.Instance->SetItemDef(ItemDef);
-	for (ULyraInventoryItemFragment* Fragment : GetDefault<ULyraInventoryItemDefinition>(ItemDef)->Fragments)
-	{
-		if (Fragment != nullptr)
-		{
-			Fragment->OnInstanceCreated(NewEntry.Instance);
-		}
-	}
-	NewEntry.StackCount = StackCount;
-	Result = NewEntry.Instance;
-
-	//const ULyraInventoryItemDefinition* ItemCDO = GetDefault<ULyraInventoryItemDefinition>(ItemDef);
-	MarkItemDirty(NewEntry);
+	// Create the item instance through the subsystem
+    if (UGameInstance* GameInstance = OwnerComponent->GetWorld()->GetGameInstance())
+    {
+        if (ULyraInventorySubsystem* InventorySubsystem = GameInstance->GetSubsystem<ULyraInventorySubsystem>())
+        {
+            FLyraInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+            NewEntry.Instance = InventorySubsystem->CreateInventoryItemInstance(OwnerComponent, ItemDef);
+            if (NewEntry.Instance)
+            {
+                NewEntry.StackCount = StackCount;
+                NewEntry.LastObservedCount = StackCount;
+                Result = NewEntry.Instance;
+                //const ULyraInventoryItemDefinition* ItemCDO = GetDefault<ULyraInventoryItemDefinition>(ItemDef);
+				//MarkItemDirty(NewEntry);
+                BroadcastChangeMessage(NewEntry, /*OldCount=*/ 0, /*NewCount=*/ StackCount);
+            }
+        }
+    }
 
 	return Result;
 }

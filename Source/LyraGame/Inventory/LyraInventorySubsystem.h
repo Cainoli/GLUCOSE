@@ -36,8 +36,19 @@ public:
     UFUNCTION(BlueprintCallable, Category="Lyra|Inventory")
     const TArray<class ULyraInventoryManagerComponent*>& GetAllInventoryComponents() const { return RegisteredInventoryComponents; }
 
+    /** Create a new inventory item instance */
+    UFUNCTION(BlueprintCallable, Category="Lyra|Inventory")
+    ULyraInventoryItemInstance* CreateInventoryItemInstance(UObject* Outer, TSubclassOf<ULyraInventoryItemDefinition> ItemDef);
+
+    /** Initialize a newly created inventory item instance */
+    void InitializeItemInstance(ULyraInventoryItemInstance* Instance, TSubclassOf<ULyraInventoryItemDefinition> ItemDef);
+
 private:
     /** List of all active inventory components */
     UPROPERTY()
     TArray<TObjectPtr<ULyraInventoryManagerComponent>> RegisteredInventoryComponents;
+	
+    /** Cache of created inventory items for proper lifecycle management */
+    UPROPERTY()
+    TArray<TObjectPtr<ULyraInventoryItemInstance>> ManagedItems;
 };

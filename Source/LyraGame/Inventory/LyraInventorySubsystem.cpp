@@ -2,6 +2,7 @@
 
 #include "LyraInventorySubsystem.h"
 #include "LyraInventoryItemDefinition.h"
+#include "LyraInventoryItemInstance.h"
 #include "LyraInventoryManagerComponent.h"
 
 void ULyraInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -11,6 +12,8 @@ void ULyraInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void ULyraInventorySubsystem::Deinitialize()
 {
+    // Cleanup managed items
+    ManagedItems.Empty();
     RegisteredInventoryComponents.Empty();
     Super::Deinitialize();
 }
@@ -37,5 +40,45 @@ void ULyraInventorySubsystem::UnregisterInventoryComponent(ULyraInventoryManager
     if (Component)
     {
         RegisteredInventoryComponents.Remove(Component);
+    }
+}
+
+ULyraInventoryItemInstance* ULyraInventorySubsystem::CreateInventoryItemInstance(UObject* Outer, TSubclassOf<ULyraInventoryItemDefinition> ItemDef)
+{
+    if (!ItemDef || !Outer)
+    {
+        return nullptr;
+    }
+
+    // Create the instance with the provided outer
+    ULyraInventoryItemInstance* NewInstance = NewObject<ULyraInventoryItemInstance>(Outer);
+    if (NewInstance)
+    {
+        InitializeItemInstance(NewInstance, ItemDef);
+        ManagedItems.Add(NewInstance);
+    }
+
+    return NewInstance;
+}
+
+void ULyraInventorySubsystem::InitializeItemInstance(ULyraInventoryItemInstance* Instance, TSubclassOf<ULyraInventoryItemDefinition> ItemDef)
+{
+    if (!Instance || !ItemDef)
+    {
+        return;
+    }
+
+    Instance->SetItemDef(ItemDef);
+
+    // Initialize with fragments
+    if (const ULyraInventoryItemDefinition* Definition = ItemDef.GetDefaultObject())
+    {
+        for (const ULyraInventoryItemFragment* Fragment : Definition->Fragments)
+        {
+            if (Fragment)
+            {
+                Fragment->OnInstanceCreated(Instance);
+            }
+        }
     }
 }

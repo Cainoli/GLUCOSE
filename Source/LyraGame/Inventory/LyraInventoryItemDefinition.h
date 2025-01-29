@@ -38,9 +38,24 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Display)
 	FText DisplayName;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(MultiLine=true), Category=Display)
+	FText Description;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Display, Instanced)
 	TArray<TObjectPtr<ULyraInventoryItemFragment>> Fragments;
+	
+	/**
+	 Maximum number of items that can be stacked together
+	 * 0 means unlimited stack size
+	 * 1 means items cannot be stacked (each item will be in its own stack)
+	 * >1 means items can be stacked up to this limit
+	*/
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Display, meta=(ClampMin="0"))
+    int32 MaxStackSize = 1;
+	
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Display, meta=(ClampMin="0"))
+    float Weight = 0.0f;
 
 public:
 	const ULyraInventoryItemFragment* FindFragmentByClass(TSubclassOf<ULyraInventoryItemFragment> FragmentClass) const;

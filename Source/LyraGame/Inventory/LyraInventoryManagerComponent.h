@@ -168,6 +168,22 @@ public:
 	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 	virtual void ReadyForReplication() override;
 	//~End of UObject interface
+	
+	// Maximum number of slots in the inventory (0 = unlimited)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category="Inventory Limits")
+    int32 MaxInventorySlots = 0;
+	
+    // Maximum total weight that can be carried (0 = unlimited)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category="Inventory Limits")
+    float MaxInventoryWeight = 0.0f;
+	
+    // Returns how many items can be added to the inventory
+    UFUNCTION(BlueprintCallable, Category=Inventory)
+    int32 GetMaxItemsCanAdd(TSubclassOf<ULyraInventoryItemDefinition> ItemDef, int32 RequestedCount) const;
+	
+    // Get current total weight of inventory
+    UFUNCTION(BlueprintCallable, Category=Inventory)
+    float GetCurrentTotalWeight() const;
 
 private:
 	UPROPERTY(Replicated)

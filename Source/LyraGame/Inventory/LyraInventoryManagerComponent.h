@@ -152,6 +152,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Inventory, BlueprintPure=false)
 	TArray<ULyraInventoryItemInstance*> GetAllItems() const;
 
+    // Returns all items that pass the specified filter
+    UFUNCTION(BlueprintCallable, Category="Lyra|Inventory")
+    TArray<ULyraInventoryItemInstance*> GetFilteredItems(TSubclassOf<ULyraInventoryFilter> Filter) const;
+
 	UFUNCTION(BlueprintCallable, Category=Inventory, BlueprintPure)
 	ULyraInventoryItemInstance* FindFirstItemStackByDefinition(TSubclassOf<ULyraInventoryItemDefinition> ItemDef) const;
 

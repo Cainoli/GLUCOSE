@@ -5,6 +5,7 @@
 #include "Engine/ActorChannel.h"
 #include "Engine/World.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
+#include "LyraInventoryFilter.h"
 #include "LyraInventoryItemDefinition.h"
 #include "LyraInventoryItemInstance.h"
 #include "NativeGameplayTags.h"
@@ -201,6 +202,30 @@ TArray<ULyraInventoryItemInstance*> ULyraInventoryManagerComponent::GetAllItems(
 	return InventoryList.GetAllItems();
 }
 
+TArray<ULyraInventoryItemInstance*> ULyraInventoryManagerComponent::GetFilteredItems(TSubclassOf<ULyraInventoryFilter> Filter) const
+{
+    TArray<ULyraInventoryItemInstance*> Results;
+
+    if (Filter == nullptr)
+    {
+    // If no filter is specified, return all items
+        return InventoryList.GetAllItems();
+    }
+    // Get all items and filter them
+    TArray<ULyraInventoryItemInstance*> AllItems = InventoryList.GetAllItems();
+    for (ULyraInventoryItemInstance* Item : AllItems)
+    {
+        if (const auto* FilterDef = Filter.GetDefaultObject())
+        {
+            if (FilterDef->PassesFilter(Item))
+            {
+                Results.Add(Item);
+            }
+        }
+    }
+    return Results;
+}
+
 ULyraInventoryItemInstance* ULyraInventoryManagerComponent::FindFirstItemStackByDefinition(TSubclassOf<ULyraInventoryItemDefinition> ItemDef) const
 {
 	for (const FLyraInventoryEntry& Entry : InventoryList.Entries)
@@ -299,22 +324,4 @@ bool ULyraInventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel,
 
 	return WroteSomething;
 }
-
-//////////////////////////////////////////////////////////////////////
-//
-
-// UCLASS(Abstract)
-// class ULyraInventoryFilter : public UObject
-// {
-// public:
-// 	virtual bool PassesFilter(ULyraInventoryItemInstance* Instance) const { return true; }
-// };
-
-// UCLASS()
-// class ULyraInventoryFilter_HasTag : public ULyraInventoryFilter
-// {
-// public:
-// 	virtual bool PassesFilter(ULyraInventoryItemInstance* Instance) const { return true; }
-// };
-
 
